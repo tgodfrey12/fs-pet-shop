@@ -3,41 +3,12 @@ const fs = require('fs');
 
 var server = http.createServer(function(req, res) {
 
-    console.log(req.url);
-
     if (req.url === '/pets') {
-        console.log("In pets");
-        var fileContents = fs.readFile('pets.json', 'utf8', (err, data) => {
-            if (err) throw err;
-            res.setHeader('Content-Type', 'text/html');
-            res.end(data);
-        })
-
+        getRequestedAnimal(req, res);
     } else if (req.url === '/pets/0') {
-        console.log("In pets 0");
-
-        var fileContents = fs.readFile('pets.json', 'utf8', (err, data) => {
-            if (err) throw err;
-
-            var parsedObject = JSON.parse(data);
-            console.log(parsedObject[0]);
-            res.setHeader('Content-Type', 'application/json');
-
-            res.end(JSON.stringify(parsedObject[0]));
-        })
-
+        getRequestedAnimal(req, res, 0);
     } else if (req.url === '/pets/1') {
-        console.log("In pets 1");
-
-        var fileContents = fs.readFile('pets.json', 'utf8', (err, data) => {
-            if (err) throw err;
-
-            var parsedObject = JSON.parse(data);
-            console.log(parsedObject[1]);
-            res.setHeader('Content-Type', 'application/json');
-
-            res.end(JSON.stringify(parsedObject[1]));
-        })
+        getRequestedAnimal(req, res, 1);
     } else {
         //return 404
         res.setHeader('Content-Type', 'text/plain');
@@ -48,3 +19,25 @@ var server = http.createServer(function(req, res) {
 })
 
 server.listen(3000);
+
+
+function getRequestedAnimal(req, res, idx) {
+    let fileContents = fs.readFile('pets.json', 'utf8', (err, data) => {
+        let allAnimals = [];
+        if (err) throw err;
+
+        var parsedObject = JSON.parse(data);
+        console.log(parsedObject[idx]);
+        res.setHeader('Content-Type', 'application/json');
+
+        //Send all the animals if no index provided
+        if (idx === undefined) {
+            for (var i = 0; i < parsedObject.length; i++) {
+                allAnimals.push(parsedObject[i]);
+            }
+            res.end(JSON.stringify(allAnimals))
+        } else {
+            res.end(JSON.stringify(parsedObject[idx]));
+        }
+    })
+}
