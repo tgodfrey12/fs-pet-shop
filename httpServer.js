@@ -23,11 +23,13 @@ server.listen(3000);
 
 function getRequestedAnimal(req, res, idx) {
     let fileContents = fs.readFile('pets.json', 'utf8', (err, data) => {
+        //create an array to store all Animals if that's what the user wants
         let allAnimals = [];
         if (err) throw err;
 
         var parsedObject = JSON.parse(data);
-        console.log(parsedObject[idx]);
+
+        //In this case, the response wii be json
         res.setHeader('Content-Type', 'application/json');
 
         //Send all the animals if no index provided
@@ -37,6 +39,7 @@ function getRequestedAnimal(req, res, idx) {
             }
             res.end(JSON.stringify(allAnimals))
         } else {
+            //Otherwise, just send the animal requested
             res.end(JSON.stringify(parsedObject[idx]));
         }
     })

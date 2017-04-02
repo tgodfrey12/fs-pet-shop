@@ -5,7 +5,7 @@ const fs = require('fs');
 var dataRead;
 
 //What is with the first 2 args?????
-if (process.argv.length === 2) {
+if (process.argv.length < 3) {
     console.log("Usage: node pets.js [read | create | update | destroy]");
 }
 
@@ -14,7 +14,6 @@ if (process.argv[2] === "read") {
         if (err) throw err;
 
         //Show all the data in the file
-        //console.log(data);
         dataRead = data;
 
         var parsedObject = JSON.parse(dataRead);
@@ -27,8 +26,9 @@ if (process.argv[2] === "read") {
             console.log(parsedObject[dataIdx]);
         }
     })
-}
+} //End of read
 
+//Create a new record
 if (process.argv[2] === "create") {
     if (process.argv.length < 6) {
         console.log("Usage: node pets.js create AGE KIND NAME");
@@ -36,23 +36,25 @@ if (process.argv[2] === "create") {
     }
 
     //Create a new data object
-    var newAnimal = {};
-    newAnimal.age = parseInt(process.argv[3]);
-    newAnimal.kind = process.argv[4];
-    newAnimal.name = process.argv[5];
-
-    console.log(newAnimal);
+    var newPet = {
+        "age": parseInt(process.argv[3]),
+        "kind": process.argv[4],
+        "name": process.argv[5]
+    }
 
     //re-read the file into a variable
+    var fileContents = fs.readFile('pets.json', 'utf8', (err, data) => {
+        if (err) throw err;
 
-    //push the newAnimal to the variable stringified
+        //console.log(JSON.parse(data));
 
-    //re-write the file completely using writeFile
+        var allAnimals = JSON.parse(data);
+        allAnimals.push(newPet);
 
-    fs.appendFile('pets.json', newAnimal, (err) => {
-        if (err) {
-            console.log(err);
-        }
-
-    });
-}
+        fs.writeFile("pets.json", JSON.stringify(allAnimals), (err) => {
+            if (err) {
+                console.log(err);
+            }
+        })
+    })
+} //End of Create
